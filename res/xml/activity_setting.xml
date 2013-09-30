@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="基本設定">
+		<EditTextPreference
+			android:key="user_name"
+			android:title="撮影者名"
+			android:defaultValue="John Doe"
+			android:dialogTitle="撮影者の名前を入力してください。" />
+		<ListPreference
+			android:key="destination"
+			android:title="送信先"
+			android:defaultValue="https://dev.applicative.jp/api/import_photo"
+			android:dialogTitle="送信先を選択してください。"
+			android:entries="@array/destination_list"
+			android:entryValues="@array/destination_url_list" />
+	</PreferenceCategory>
+</PreferenceScreen>
