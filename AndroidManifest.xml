@@ -18,8 +18,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.applicative.goldrush.bccam.MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,8 +27,7 @@
         </activity>
         <activity
             android:name=".SettingActivity"
-            android:label="詳細設定" 
-            android:screenOrientation="landscape" >
+            android:label="詳細設定" >
         </activity>
     </application>
 
