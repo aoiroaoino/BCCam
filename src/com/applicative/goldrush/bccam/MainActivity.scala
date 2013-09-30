@@ -18,16 +18,26 @@ import android.view.MenuItem
 import android.util.Log
 import android.content.SharedPreferences
 import android.content.Context
-
+import android.view.SurfaceView
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.GestureDetector.SimpleOnGestureListener
 
 class MainActivity extends Activity {
   
+  private var gestureDetector: GestureDetector = _
+  private var preview: Preview = _
+  
   protected override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
-    
-//    requestWindowFeature(Window.FEATURE_NO_TITLE)
+    requestWindowFeature(Window.FEATURE_NO_TITLE)
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    setContentView(new Preview(this))
+    
+    
+    preview = new Preview(this)
+    gestureDetector = new GestureDetector(this, gestureListener)
+    
+    setContentView(preview)
   }
   
   override def onCreateOptionsMenu(menu: Menu): Boolean = {
@@ -44,6 +54,19 @@ class MainActivity extends Activity {
       case _ => {
         false
       }
+    }
+  }
+  
+  override def onTouchEvent(event: MotionEvent): Boolean = {
+    gestureDetector.onTouchEvent(event)
+    super.onTouchEvent(event)
+  }
+  
+  private val gestureListener = new SimpleOnGestureListener() {
+    override def onDoubleTap(event: MotionEvent): Boolean = {
+      Log.e("event", "Double Touch")
+      preview.takePicture
+      true
     }
   }
 }

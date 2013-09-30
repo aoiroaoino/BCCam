@@ -19,9 +19,13 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.widget.Toast
 import android.preference.Preference
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 
-class Preview(context: Context) extends SurfaceView(context) with SurfaceHolder.Callback {  
-  private var mCamera: Camera = _
+class Preview(context: Context) extends SurfaceView(context)
+  with SurfaceHolder.Callback
+{
+  var mCamera: Camera = _
   private var previewSize: Camera#Size = _
 
   private val mHolder = getHolder
@@ -50,16 +54,12 @@ class Preview(context: Context) extends SurfaceView(context) with SurfaceHolder.
 	}    
   }
   
-  // Take a picture
-  override def onTouchEvent(event: MotionEvent): Boolean = {
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      if (mCamera != null) {
-        mCamera.takePicture(mSutterListener, null, mPictureListener)
-      }
+  private val autoFocusListener = new Camera.AutoFocusCallback() {
+    def onAutoFocus(success: Boolean, camera: Camera): Unit = {
+      if (success) mCamera.takePicture(mSutterListener, null, mPictureListener)
     }
-    true
   }
-
+  
   def surfaceCreated(holder: SurfaceHolder): Unit = {
     try {
       mCamera = Camera.open()
@@ -91,4 +91,11 @@ class Preview(context: Context) extends SurfaceView(context) with SurfaceHolder.
     mCamera.release()
   }
   
+  def takePicture(): Unit = {
+    if (mCamera != null) {
+      // オートフォーカスして撮影
+      mCamera.autoFocus(autoFocusListener)
+//      mCamera.takePicture(mSutterListener, null, mPictureListener)
+    }
+  }
 }
