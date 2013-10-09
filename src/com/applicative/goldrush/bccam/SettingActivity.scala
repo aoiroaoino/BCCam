@@ -11,7 +11,19 @@ class SettingActivity extends Activity {
   
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
-    getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFlagment()).commit()
+    getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFlagment()).commit()    
+  }
+  
+  override def onStart(): Unit = {
+    super.onStart()
+  }
+  
+  override def onSaveInstanceState(outState: Bundle): Unit = {
+    super.onSaveInstanceState(outState)
+  }
+  
+  override def onRestoreInstanceState(savedInstanceState: Bundle): Unit = {
+    super.onRestoreInstanceState(savedInstanceState)
   }
   
   class SettingsFlagment extends PreferenceFragment
