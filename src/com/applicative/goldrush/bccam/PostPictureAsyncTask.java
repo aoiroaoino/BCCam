@@ -76,12 +76,12 @@ public class PostPictureAsyncTask extends AsyncTask<PostPictureParams, Void, Str
 
             // 結果が正しく帰って来なければエラー
             if ( status != HttpStatus.SC_OK ){
-                throw new Exception("Send error");
+                throw new Exception("" + status);
             }
-            Log.i("response", EntityUtils.toString(response.getEntity()));
+
             return "送信成功しました";
         } catch (Exception e) {
-            return "送信失敗しました";
+            return "送信失敗しました\nStatus Code: " + e.getMessage();
         }
     }
 }
