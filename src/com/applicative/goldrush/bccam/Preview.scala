@@ -21,6 +21,9 @@ import android.widget.Toast
 import android.preference.Preference
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.Surface
+import android.content.res.Configuration
+import android.graphics.Color
 
 class Preview(context: Context) extends SurfaceView(context)
   with SurfaceHolder.Callback
@@ -73,16 +76,48 @@ class Preview(context: Context) extends SurfaceView(context)
   }
 
   def surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int): Unit = {
+    // 横向きを基準とした現在の角度
+    val degree = getCameraDisplayOrientation(this.getContext.asInstanceOf[Activity])
+    Log.e("degree", degree.toString)
+    
     mCamera.stopPreview()
+    
+    // プレビュー表示の向きを決める
+    mCamera.setDisplayOrientation(degree)
+
+    // 撮影された画像の向きを決める
     val params = mCamera.getParameters
-    // 横向き固定のため、params変更しない
-    // params.setPreviewSize(previewSize.width, previewSize.height)
-    // params.setPreviewFormat(PixelFormat.JPEG)
-    try {
-      mCamera.setParameters(params)
-    } catch {
-      case e: Exception => Log.e("NullPo", e.getMessage)
+    params.setRotation(degree)
+    Log.e("size", s"width: $width , height: $height")
+    
+    // 端末でサポートされている最大サイズを用いる
+    val size = params.getSupportedPreviewSizes.head
+    Log.e("set support size", s"width: ${size.width} , height: ${size.height}")
+    params.setPreviewSize(size.width, size.height)
+    
+    // アスペクト比を保ちつつ、最大表示
+    val layoutParams = this.getLayoutParams
+    var layoutH: Double = 1.0
+    var layoutW: Double = 1.0
+    
+    if (isPortrate) {
+      layoutW = size.height
+      layoutH = size.width
+    } else {
+      layoutW = size.width
+      layoutH = size.height
     }
+    
+    val ratioW: Double = width / layoutW
+    val ratioH: Double = height / layoutH
+    val ratio = if (ratioW < ratioH) ratioW else ratioH
+    Log.i("ratio", s"width: $ratioW , height: $ratioH")
+    
+    layoutParams.width = (layoutW * ratio).toInt
+    layoutParams.height = (layoutH * ratio).toInt
+    
+    // 各パラメータをセット
+    mCamera.setParameters(params)
     mCamera.startPreview()
   }
 
@@ -97,5 +132,19 @@ class Preview(context: Context) extends SurfaceView(context)
       mCamera.autoFocus(autoFocusListener)
 //      mCamera.takePicture(mSutterListener, null, mPictureListener)
     }
+  }
+  
+  private def getCameraDisplayOrientation(activity: Activity): Int = {
+    val degree = activity.getWindowManager.getDefaultDisplay.getRotation match {
+      case Surface.ROTATION_0 => 0
+      case Surface.ROTATION_90 => 90
+      case Surface.ROTATION_180 => 180
+      case Surface.ROTATION_270 => 270
+    }
+    (90 + 360 - degree) % 360
+  }
+  
+  private def isPortrate(): Boolean = {
+    this.getContext.asInstanceOf[Activity].getResources.getConfiguration.orientation == Configuration.ORIENTATION_PORTRAIT
   }
 }
